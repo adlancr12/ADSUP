@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Klaim - BNI Life</title>
+    
+    <style>
+        /* --- Tema Warna BNI Life --- */
+        :root {
+            --color-bni: #007681;
+            --color-bni-dark: #005a63; 
+            --color-accent: #ff9100;
+            --color-bg: #f5f7fa;
+            --color-text-dark: #333;
+            --color-text-light: #6c757d;
+            --color-danger: #dc3545;
+        }
+        
+        /* --- General Styling --- */
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--color-bg);
+            margin: 0;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* --- Header Styling --- */
+        .header {
+            width: 100%;
+            background-color: white;
+            box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
+            padding: 10px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+            margin-bottom: 30px;
+        }
+
+        .header .logo-bni-life img {
+            height: 35px; 
+            max-width: 100%;
+            display: block; 
+        }
+
+        .user-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-controls .account-name {
+            font-size: 15px;
+            color: var(--color-text-dark);
+            font-weight: 500;
+        }
+
+        .user-controls .back-button {
+            background-color: var(--color-bni);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: background-color 0.2s ease;
+        }
+        
+        .user-controls .back-button:hover {
+            background-color: var(--color-bni-dark);
+        }
+
+        /* --- Kalkulator Content Layout --- */
+        .calculator-container {
+            width: 90%;
+            max-width: 600px; 
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            padding: 30px;
+            margin-top: 20px;
+        }
+        
+        .calculator-container h1 {
+            color: var(--color-bni);
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+            margin-top: 0;
+            font-size: 24px;
+        }
+
+        /* --- Form Styling --- */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--color-text-dark);
+            font-size: 15px;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 15px;
+        }
+
+        /* --- Hasil Kalkulasi --- */
+        #resultDisplay {
+            margin-top: 30px;
+            padding: 20px;
+            border: 2px solid var(--color-bni);
+            border-radius: 8px;
+            background-color: #e6f7f7;
+            text-align: center;
+        }
+        
+        #resultDisplay p {
+            margin: 5px 0;
+            font-size: 18px;
+            font-weight: 500;
+        }
+        
+        #resultAmount {
+            font-size: 32px;
+            color: var(--color-danger);
+            font-weight: 700;
+            margin-top: 10px;
+        }
+        
+        /* --- Tombol Kalkulasi --- */
+        .calculate-button {
+            background-color: var(--color-accent);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background-color 0.2s ease;
+            width: 100%;
+        }
+        
+        .calculate-button:hover {
+            background-color: #cc7400;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="logo-bni-life">
+            <img src="BNI_Life.png" alt="BNI Life Logo"> 
+        </div>
+        <div class="user-controls">
+            <button class="back-button" onclick="window.location.href='index.html';">
+                &larr; Kembali ke Dashboard
+            </button>
+            <span class="account-name">Halo, Admin</span>
+        </div>
+    </header>
+
+    <div class="calculator-container">
+        <h1>Kalkulator Estimasi Klaim</h1>
+
+        <form id="claimCalculatorForm">
+            <div class="form-group">
+                <label for="policyType">Jenis Polis:</label>
+                <select id="policyType" required>
+                    <option value="">-- Pilih Jenis Polis --</option>
+                    <option value="AJK">AJK (Asuransi Jiwa Kredit)</option>
+                    <option value="Tradisional">Tradisional (Whole Life/Term)</option>
+                    <option value="UnitLink">Unit Link</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="claimReason">Jenis Klaim:</label>
+                <select id="claimReason" required>
+                    <option value="">-- Pilih Sebab Klaim --</option>
+                    <option value="Meninggal">Meninggal Dunia</option>
+                    <option value="Kesehatan">Kesehatan (Kritis/Rawat Inap)</option>
+                    <option value="Tebus">Penebusan Polis (Surrender)</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="usia">Usia Tertanggung (Tahun):</label>
+                <input type="number" id="usia" placeholder="Masukkan usia saat ini" required min="18" max="70">
+            </div>
+            
+            <div class="form-group">
+                <label for="up">Uang Pertanggungan (Rp):</label>
+                <input type="number" id="up" placeholder="Contoh: 100000000" required min="0">
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="calculate-button">Hitung Estimasi Nilai Klaim</button>
+            </div>
+        </form>
+
+        <div id="resultDisplay" style="display:none;">
+            <p>Estimasi Nilai Klaim:</p>
+            <p id="resultAmount">Rp 0</p>
+            <p style="font-size: 12px; color: var(--color-danger);">*Estimasi, perhitungan akhir tergantung hasil verifikasi.</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('claimCalculatorForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const policyType = document.getElementById('policyType').value;
+            const claimReason = document.getElementById('claimReason').value;
+            const usia = parseInt(document.getElementById('usia').value);
+            const up = parseInt(document.getElementById('up').value);
+            const resultDisplay = document.getElementById('resultDisplay');
+            const resultAmount = document.getElementById('resultAmount');
+            
+            let estimatedAmount = 0;
+
+            // --- Logika Simulasi Klaim ---
+            if (policyType === 'AJK' && claimReason === 'Meninggal') {
+                estimatedAmount = up;
+            } else if (policyType === 'Tradisional' && claimReason === 'Meninggal') {
+                estimatedAmount = up * 1.10;
+            } else if (policyType === 'UnitLink' && claimReason === 'Tebus') {
+                estimatedAmount = up * 0.50;
+            } else if (claimReason === 'Kesehatan') {
+                 estimatedAmount = 50000000;
+            } else {
+                estimatedAmount = up * 0.80;
+            }
+            // --- End Logika Simulasi ---
+
+            // Format angka ke Rupiah
+            const formatter = new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0
+            });
+            
+            resultAmount.textContent = formatter.format(estimatedAmount);
+            resultDisplay.style.display = 'block';
+        });
+    </script>
+</body>
+</html>

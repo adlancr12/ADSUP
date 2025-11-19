@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login LuMi's</title>
+    
+    <style>
+        /* --- Tema Warna BNI Life --- */
+        :root {
+            --color-bni: #007681;
+            --color-bni-dark: #005a63; 
+            --color-accent: #ff9100;
+            --color-bg: #f5f7fa;
+            --color-text-dark: #333;
+            --color-text-light: #888;
+        }
+        
+        /* --- General Styling --- */
+        body {
+            font-family: 'Segoe UI', 'Poppins', sans-serif; 
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            
+            /* Latar Belakang Gambar */
+            background-image: url('naruto_lufft.jpg'); 
+            background-size: cover; 
+            background-position: center; 
+            background-repeat: no-repeat; 
+            background-attachment: fixed; 
+            position: relative; 
+        }
+
+        /* Overlay yang lebih optimal untuk kontras */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* Sedikit lebih gelap dari sebelumnya (0.4) untuk kontras maksimal */
+            z-index: 1; 
+        }
+
+        /* --- Login Card Container --- */
+        .login-card {
+            background-color: white; 
+            padding: 50px 40px; 
+            border-radius: 15px; /* Sudut lebih lembut */
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3); /* Shadow yang lebih tajam dan elegan */
+            width: 100%;
+            max-width: 400px; 
+            text-align: center;
+            position: relative; 
+            z-index: 2;
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
+        }
+
+        .login-card:hover {
+             box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35); /* Shadow membesar saat hover */
+        }
+
+        /* --- Header Logo --- */
+        .login-card-header {
+            margin-bottom: 30px;
+        }
+        
+        .login-card-header img {
+            height: 50px; /* Logo BNI Life sedikit lebih besar */
+            margin-bottom: 15px;
+        }
+        
+        .login-card-header h1 {
+            color: var(--color-bni);
+            font-size: 36px; 
+            font-weight: 900;
+            margin: 0;
+            letter-spacing: 2px;
+        }
+
+        .login-card-header p.fms-tagline {
+            font-size: 14px;
+            color: var(--color-text-light);
+            margin-top: 5px;
+            font-weight: 500;
+        }
+        
+        /* --- Form Styling --- */
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--color-text-dark);
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px; 
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 16px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        
+        .form-group input:focus {
+            border-color: var(--color-bni); /* Border berubah warna */
+            box-shadow: 0 0 0 1px var(--color-bni); /* Menghilangkan shadow box yang terlalu besar */
+            outline: none;
+        }
+
+        /* Password Show/Hide Styling */
+        .password-container {
+            position: relative;
+        }
+        
+        .password-container button {
+            color: var(--color-text-light);
+            transition: color 0.2s;
+        }
+
+        .password-container button:hover {
+            color: var(--color-bni);
+        }
+
+        /* --- Login Button --- */
+        .login-button {
+            width: 100%;
+            background-color: var(--color-bni);
+            color: white;
+            border: none;
+            padding: 14px; 
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 17px;
+            font-weight: 600;
+            margin-top: 25px;
+            box-shadow: 0 4px 15px rgba(0, 118, 129, 0.4); 
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .login-button:hover {
+            background-color: var(--color-bni-dark);
+            box-shadow: 0 6px 20px rgba(0, 118, 129, 0.5);
+            transform: translateY(-1px); /* Efek angkat ringan */
+        }
+
+        /* --- Footer Links --- */
+        .footer-links {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+        }
+
+        .footer-links a {
+            color: var(--color-bni);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        
+        .footer-links a:hover {
+            color: var(--color-bni-dark);
+            text-decoration: underline;
+        }
+        
+        .footer-links .create-account {
+            color: var(--color-accent);
+            font-weight: 600;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <div class="login-card-header">
+            <img src="BNI_Life.png" alt="BNI Life Logo">
+            <h1>LuMi's</h1>
+            <p class="fms-tagline">Follow-up &bull; Maintenance &bull; Services After Sales</p>
+        </div>
+
+        <form onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Masukkan ID Pengguna" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="password-container">
+                    <input type="password" id="password" placeholder="Masukkan Kata Sandi" required>
+                    <button type="button" onclick="togglePassword()">
+                        Show
+                    </button>
+                </div>
+            </div>
+            
+            <button type="submit" class="login-button">
+                Login
+            </button>
+        </form>
+
+        <div class="footer-links">
+            <a href="#" onclick="alert('Halaman Lupa Password sedang dikembangkan.')">Lupa Password?</a>
+            <a href="#" class="create-account" onclick="alert('Halaman Buat Akun sedang dikembangkan.')">Buat Akun</a>
+        </div>
+    </div>
+
+    <script>
+        function togglePassword() {
+            const passwordField = document.getElementById('password');
+            const toggleButton = document.querySelector('.password-container button');
+            
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                toggleButton.textContent = 'Hide';
+            } else {
+                passwordField.type = 'password';
+                toggleButton.textContent = 'Show';
+            }
+        }
+
+        function handleLogin(event) {
+            event.preventDefault(); 
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            const correctUsername = '2001180';
+            const correctPassword = 'LUMItest';
+
+            if (username === correctUsername && password === correctPassword) {
+                alert(`Login Berhasil! Selamat datang, ${username}.`);
+                window.location.href = 'index.html'; 
+            } else {
+                alert('Username atau Password salah. Silakan coba lagi.');
+            }
+        }
+    </script>
+</body>
+</html>

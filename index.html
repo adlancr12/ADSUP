@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LuMi's FMS - BNI Life Dashboard (Final UI)</title>
+    
+    <style>
+        /* --- Tema Warna BNI Life --- */
+        :root {
+            --color-bni: #007681;
+            --color-bni-dark: #005a63; 
+            --color-accent: #ff9100;
+            --color-bg: #f5f7fa;
+            --color-text-dark: #333;
+            --color-text-light: #6c757d;
+            --color-success: #28a745;
+            --color-danger: #dc3545;
+            --color-table-header: #e6f7f7;
+            --color-table-row-odd: #ffffff;
+            --color-table-row-even: #f9f9f9;
+            
+            /* Status Indicators */
+            --status-inforce: #00b300; 
+            --status-lapse: #ffcc00; 
+            --status-terminated: var(--color-danger); 
+            --status-paid: var(--color-success);
+            --status-unpaid: #ff6600; 
+            --status-done: var(--color-bni);
+            --status-progress: var(--color-accent);
+        }
+        
+        /* --- General Styling --- */
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--color-bg);
+            margin: 0;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* --- Header Styling --- */
+        .header {
+            width: 100%;
+            background-color: white;
+            box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
+            padding: 10px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+            margin-bottom: 30px;
+        }
+
+        .header .logo-bni-life img {
+            height: 35px; 
+            max-width: 100%;
+            display: block; 
+        }
+
+        .user-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-controls .account-name {
+            font-size: 15px;
+            color: var(--color-text-dark);
+            font-weight: 500;
+        }
+        
+        .calculator-button {
+            background-color: var(--color-bni);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: background-color 0.2s ease;
+        }
+        
+        .user-controls .logout-button {
+            background-color: var(--color-danger);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: background-color 0.2s ease;
+        }
+
+        /* --- Content Layout --- */
+        .content-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 90%;
+            max-width: 1200px; 
+            padding-bottom: 50px;
+        }
+        
+        .logo-header {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--color-bni); 
+            margin-bottom: 0; 
+            letter-spacing: 1px;
+        }
+        
+        .fms-tagline {
+            font-size: 14px;
+            color: var(--color-text-light);
+            margin-top: 5px; 
+            margin-bottom: 35px; 
+            font-weight: 500;
+        }
+
+        /* --- SEARCH BAR (Dipertahankan) --- */
+        .search-container-only {
+            display: flex;
+            align-items: center;
+            width: 800px; 
+            max-width: 90%;
+            background-color: white;
+            border-radius: 10px; 
+            padding: 5px; 
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); 
+            height: 50px; 
+            box-sizing: border-box;
+            margin-bottom: 30px;
+        }
+
+        .menu-button, .submit-button {
+            font-size: 15px;
+            font-weight: 600;
+            padding: 0 18px; 
+            height: 40px; 
+            border-radius: 8px; 
+            border: none;
+            transition: background-color 0.2s ease;
+            flex-shrink: 0; 
+        }
+
+        .menu-button {
+            background-color: var(--color-bni);
+            color: white;
+            margin-right: 10px; 
+        }
+        
+        .submit-button {
+            background-color: var(--color-success);
+            color: white;
+            margin-left: 10px; 
+        }
+
+        #searchInput {
+            flex-grow: 1;
+            border: 1px solid #e0e0e0; 
+            border-radius: 6px;
+            outline: none;
+            font-size: 16px;
+            color: var(--color-text-dark); 
+            padding: 0 15px; 
+            height: 40px; 
+            background-color: #ffffff;
+            transition: border-color 0.3s;
+        }
+        
+        /* --- TABLE STYLING (Perbaikan UI) --- */
+        .table-wrapper {
+            width: 100%;
+            margin-bottom: 40px; 
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+        
+        .table-wrapper h3 {
+            background-color: var(--color-bni);
+            color: white;
+            padding: 12px 20px;
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        #resultsTable, .history-table, #managedDataTable {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        #resultsTable th, #resultsTable td, .history-table th, .history-table td, #managedDataTable th, #managedDataTable td {
+            border: none;
+            border-bottom: 1px solid #e0e0e0; 
+            padding: 14px 15px; /* Padding disesuaikan */
+            text-align: left;
+            vertical-align: middle;
+            color: var(--color-text-dark);
+            font-size: 14px;
+        }
+
+        /* Header Tabel */
+        #resultsTable th, #managedDataTable th {
+            background-color: var(--color-table-header); 
+            color: var(--color-bni);
+            font-weight: 600;
+            font-size: 13px; /* Font header lebih kecil agar muat */
+            text-transform: uppercase;
+        }
+        
+        /* Striping & Hover */
+        #resultsTable tr:nth-child(even), #managedDataTable tr:nth-child(even), .history-table tr:nth-child(even) {
+             background-color: var(--color-table-row-even);
+        }
+        #resultsTable tr:hover, #managedDataTable tr:hover, .history-table tr:hover {
+            background-color: #eef7ff; 
+        }
+
+        /* Lebar Kolom Aksi */
+        #resultsTable th:last-child, #managedDataTable th:last-child {
+            width: 80px; /* Lebar tetap untuk kolom aksi */
+            text-align: center;
+        }
+        #resultsTable td:last-child, #managedDataTable td:last-child {
+            text-align: center;
+        }
+
+        /* --- STYLING STATUS (Kunci Kerapian UI) --- */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+            text-align: center;
+            min-width: 60px;
+        }
+
+        /* Status Polis */
+        .status-inforce { background-color: var(--status-inforce); }
+        .status-lapse { background-color: var(--status-lapse); color: var(--color-text-dark); }
+        .status-terminated { background-color: var(--status-terminated); }
+
+        /* Status Klaim/Service */
+        .status-done { background-color: var(--status-done); }
+        .status-onprogress { background-color: var(--status-progress); color: var(--color-text-dark); }
+        .status-tidakada { background-color: #ccc; color: var(--color-text-dark); }
+
+        /* Status Payment */
+        .status-paid { background-color: var(--status-paid); }
+        .status-unpaid { background-color: var(--status-unpaid); }
+        
+        .action-btn, .managed-action-btn {
+            background-color: var(--color-accent); 
+            color: white;
+            font-weight: 600;
+            border-radius: 4px;
+            padding: 6px 10px;
+            font-size: 13px;
+        }
+        
+        /* --- MODAL STYLING (Dipertahankan) --- */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 200; 
+            background-color: rgba(0,0,0,0.7); 
+        }
+        
+        .modal-content {
+            border-radius: 10px;
+            margin: 5% auto; 
+            overflow: hidden;
+        }
+        .modal-header {
+            background-color: var(--color-bni);
+            color: white;
+            padding: 15px 20px;
+        }
+        
+        /* List Aksi Tombol (RAPI) */
+        .modal-body { padding: 20px 30px 30px; }
+        .modal-content .action-button-list { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+        .modal-content .action-button-list button {
+            font-size: 16px; padding: 15px 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.1s ease;
+        }
+        
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="logo-bni-life">
+            <img src="BNI_Life.png" alt="BNI Life Logo"> 
+        </div>
+        <div class="user-controls">
+            <button class="calculator-button" onclick="window.location.href='kalkulator_klaim.html';">
+                Kalkulator Klaim
+            </button>
+            <span class="account-name">Halo, Admin</span>
+            <button class="logout-button" onclick="window.location.href='login.html';">
+                Logout
+            </button>
+        </div>
+    </header>
+
+    <div id="searchPolicySection" class="content-section">
+        <h1 class="logo-header">LuMi's</h1> 
+        <p class="fms-tagline">
+            Follow-up &bull; Maintenance &bull; Services After Sales
+        </p>
+        
+        <form class="search-container-only" id="searchForm">
+            <button type="button" class="menu-button" onclick="showManagedData()">
+                Data Kelolaan
+            </button>
+            <input type="text" id="searchInput" placeholder="Search Polis: AJK, IBR, EB, TEL..." required>
+            <button type="submit" class="submit-button">
+                Cari
+            </button>
+        </form>
+
+        <p id="message"></p>
+        
+        <div id="mainResultWrapper" class="table-wrapper" style="display:none;">
+            <h3>Informasi Polis Utama</h3>
+            <table id="resultsTable">
+                <thead>
+                    <tr>
+                        <th style="width: 10%;">No. Polis</th>
+                        <th style="width: 25%;">Nama Nasabah</th>
+                        <th style="width: 10%;">Status Polis</th>
+                        <th style="width: 12%;">Pengajuan Klaim</th>
+                        <th style="width: 12%;">Pengajuan SP</th>
+                        <th style="width: 10%;">Pembayaran</th>
+                        <th style="width: 10%;">Channel Bisnis</th>
+                        <th style="width: 10%; text-align: center;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="resultsBody"></tbody>
+            </table>
+        </div>
+
+        <div id="claimHistoryWrapper" class="table-wrapper" style="display:none;">
+            <h3>Riwayat Pengajuan Claim</h3>
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th style="width: 25%;">Nomor Polis</th>
+                        <th style="width: 20%;">Status</th>
+                        <th style="width: 30%;">Tanggal Input</th>
+                        <th style="width: 25%;">User Input</th>
+                    </tr>
+                </thead>
+                <tbody id="claimHistoryBody"></tbody>
+            </table>
+        </div>
+
+        <div id="serviceHistoryWrapper" class="table-wrapper" style="display:none;">
+            <h3>Riwayat Pengajuan Service Policy</h3>
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th style="width: 25%;">Nomor Polis</th>
+                        <th style="width: 20%;">Status</th>
+                        <th style="width: 30%;">Tanggal Input</th>
+                        <th style="width: 25%;">User Input</th>
+                    </tr>
+                </thead>
+                <tbody id="serviceHistoryBody"></tbody>
+            </table>
+        </div>
+
+        <div id="complaintHistoryWrapper" class="table-wrapper" style="display:none;">
+            <h3>Riwayat Complaint</h3>
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th style="width: 20%;">Nomor Polis</th>
+                        <th style="width: 35%;">Detail Complaint</th>
+                        <th style="width: 25%;">Tanggal Input</th>
+                        <th style="width: 20%;">User Input</th>
+                    </tr>
+                </thead>
+                <tbody id="complaintHistoryBody"></tbody>
+            </table>
+        </div>
+
+    </div>
+    
+    <div id="managedDataSection" class="content-section" style="display: none;">
+        <h1 class="logo-header">Data Kelolaan</h1>
+        <p class="fms-tagline">
+            Daftar SPAJ dan Polis dalam Jangkauan Anda
+        </p>
+        
+        <button type="button" class="menu-button" style="margin-bottom: 25px;" onclick="showSearchPolicy()">
+            &larr; Kembali ke Pencarian Polis
+        </button>
+
+        <div class="table-wrapper">
+            <h3>Daftar Data Kelolaan Anda</h3>
+            <table id="managedDataTable">
+                <thead>
+                    <tr>
+                        <th style="width: 15%;">No. SPAJ</th>
+                        <th style="width: 25%;">Nama Nasabah</th>
+                        <th style="width: 15%;">Grace Periode</th>
+                        <th style="width: 15%;">Status Policy</th>
+                        <th style="width: 15%;">Nama BAS</th>
+                        <th style="width: 10%;">Akhir Polis</th>
+                        <th style="width: 5%; text-align: center;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="managedDataBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+
+    <div id="actionSelectModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Pilih Jenis Aksi</h2>
+                <span class="close-btn action-close-btn">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>No. Polis: <span id="actionModalPolis" style="font-weight: 600; color: var(--color-bni);"></span></p>
+                <div class="action-button-list">
+                    <button class="btn-claim" onclick="openSpecificModal('Claim')">Input Claim</button>
+                    <button class="btn-service" onclick="openSpecificModal('ServicePolicy')">Input Service Policy</button>
+                    <button class="btn-complaint" onclick="openSpecificModal('Complaint')">Input Complaint</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="claimModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Pengajuan Klaim Baru</h2>
+                <span class="close-btn claim-close-btn">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="claimForm">
+                    <label for="modalPolis">No. Polis:</label>
+                    <input type="text" id="modalPolis" name="polis" readonly>
+
+                    <label for="modalNasabah">Nama Nasabah:</label>
+                    <input type="text" id="modalNasabah" name="nasabah" readonly>
+
+                    <label for="jenisKlaim">Jenis Klaim:</label>
+                    <input type="text" id="jenisKlaim" name="jenisKlaim" placeholder="Contoh: Meninggal/Kesehatan" required>
+                    
+                    <label for="deskripsiKlaim">Deskripsi Singkat Kejadian:</label>
+                    <textarea id="deskripsiKlaim" name="deskripsiKlaim" rows="4" required></textarea>
+                    
+                    <button type="submit" class="modal-submit-btn">Submit Pengajuan</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div id="managedDataActionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Aksi Data Kelolaan</h2>
+                <span class="close-btn managed-close-btn">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>SPAJ: <span id="managedModalSpaj" style="font-weight: 600; color: var(--color-bni);"></span> / Nasabah: <span id="managedModalNasabah"></span></p>
+                <hr>
+                <div style="margin-top: 20px; text-align: center;">
+                    <button class="managed-action-btn btn-service" onclick="handleManagedDataAction('InputActivity')">Input Activity</button>
+                    <button class="managed-action-btn btn-claim" onclick="handleManagedDataAction('Detail')">Detail</button>
+                </div>
+                
+                <div id="activityFormWrapper" style="display: none; margin-top: 30px; padding: 15px; border: 1px solid #ddd; border-radius: 5px;">
+                    <h3>Input Aktivitas Baru</h3>
+                    <form id="activityForm">
+                        <label for="activityType">Jenis Aktivitas:</label>
+                        <input type="text" id="activityType" placeholder="Contoh: Telepon, Kunjungan" required>
+                        
+                        <label for="activityNotes">Catatan:</label>
+                        <textarea id="activityNotes" rows="3" required></textarea>
+                        
+                        <button type="submit" class="modal-submit-btn">Submit Aktivitas</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // --- DATA SIMULASI ---
+        const simulatedData = {
+            'AJK': { polis: 'P-AJK-8765', nama: 'Andi Jaya Kusuma', status_polis: 'Inforce', claim: 'Done', service: 'Tidak ada pengajuan', payment: 'Paid', channel: 'AJK', history: { claim: [{ status: 'Done', date: '2024-10-15', user: 'AdminA' }], service: [{ status: 'Diajukan', date: '2024-11-01', user: 'AdminB' }, { status: 'Done', date: '2023-05-20', user: 'AdminC' }], complaint: [{ detail: 'Lama proses SPK', date: '2024-09-01', user: 'AdminA' }] } },
+            'IBR': { polis: 'P-IBR-4321', nama: 'Budi Raharjo', status_polis: 'Lapsed', claim: 'On progress', service: 'On progress', payment: 'Unpaid', channel: 'IBR', history: { claim: [{ status: 'Diajukan', date: '2024-11-08', user: 'AdminD' }], service: [], complaint: [{ detail: 'Kesalahan input data', date: '2024-10-01', user: 'AdminE' }, { detail: 'Komunikasi kurang jelas', date: '2024-08-10', user: 'AdminD' }] } },
+            'EB': { polis: 'P-EB-1122', nama: 'Citra Banu', status_polis: 'Inforce', claim: 'Tidak ada pengajuan', service: 'Done', payment: 'Paid', channel: 'EB', history: { claim: [], service: [], complaint: [] } },
+            'TEL': { polis: 'P-TEL-5566', nama: 'Dina Lestari', status_polis: 'Terminated', claim: 'Done', service: 'Tidak ada pengajuan', payment: 'Paid', channel: 'TEL', history: { claim: [], service: [], complaint: [] } }
+        };
+
+        const managedDataList = [
+            { spaj: 'S-77001', nasabah: 'Rizky Pratama', grace: '60 Hari', status: 'Inforce', bas: 'Bimo A.', end_date: '2026-04-15' },
+            { spaj: 'S-77002', nasabah: 'Siti Mulyani', grace: '30 Hari', status: 'Lapse', bas: 'Nina S.', end_date: '2025-01-20' },
+            { spaj: 'S-77003', nasabah: 'Joko Susanto', grace: '90 Hari', status: 'Inforce', bas: 'Bimo A.', end_date: '2027-11-01' },
+            { spaj: 'S-77004', nasabah: 'Lia Herawati', grace: '0 Hari', status: 'Terminated', bas: 'Nina S.', end_date: '2024-06-01' },
+            { spaj: 'S-77005', nasabah: 'Fajar Kurniawan', grace: '30 Hari', status: 'Inforce', bas: 'Tono M.', end_date: '2026-08-10' },
+        ];
+        
+        // --- GLOBAL ELEMENTS & VARIABLES ---
+        const searchPolicySection = document.getElementById('searchPolicySection');
+        const managedDataSection = document.getElementById('managedDataSection');
+        const managedDataBody = document.getElementById('managedDataBody');
+        const searchForm = document.getElementById('searchForm');
+        const resultsBody = document.getElementById('resultsBody');
+        const mainResultWrapper = document.getElementById('mainResultWrapper');
+        const message = document.getElementById('message');
+        const claimHistoryBody = document.getElementById('claimHistoryBody');
+        const serviceHistoryBody = document.getElementById('serviceHistoryBody');
+        const complaintHistoryBody = document.getElementById('complaintHistoryBody');
+        const historyWrappers = [ document.getElementById('claimHistoryWrapper'), document.getElementById('serviceHistoryWrapper'), document.getElementById('complaintHistoryWrapper') ];
+        const actionSelectModal = document.getElementById('actionSelectModal');
+        const claimModal = document.getElementById('claimModal');
+        const managedDataActionModal = document.getElementById('managedDataActionModal');
+        const managedModalSpaj = document.getElementById('managedModalSpaj');
+        const managedModalNasabah = document.getElementById('managedModalNasabah');
+        const activityFormWrapper = document.getElementById('activityFormWrapper');
+        const activityForm = document.getElementById('activityForm');
+        
+        const modalPolis = document.getElementById('modalPolis');
+        const modalNasabah = document.getElementById('modalNasabah');
+        const claimForm = document.getElementById('claimForm');
+
+        let currentPolis = '';
+        let currentNasabah = '';
+        let currentChannelKey = '';
+        let currentManagedDataSPAJ = ''; 
+
+        // --- HELPER FUNCTION UNTUK STATUS BADGE ---
+        function getStatusBadge(statusText) {
+            let className = '';
+            statusText = statusText.toLowerCase();
+
+            if (statusText.includes('inforce')) {
+                className = 'status-inforce';
+            } else if (statusText.includes('lapse')) {
+                className = 'status-lapse';
+            } else if (statusText.includes('terminated')) {
+                className = 'status-terminated';
+            } else if (statusText.includes('paid')) {
+                className = 'status-paid';
+            } else if (statusText.includes('unpaid')) {
+                className = 'status-unpaid';
+            } else if (statusText.includes('done')) {
+                className = 'status-done';
+            } else if (statusText.includes('on progress') || statusText.includes('diajukan')) {
+                className = 'status-onprogress';
+            } else if (statusText.includes('tidak ada')) {
+                className = 'status-tidakada';
+            }
+            return `<span class="status-badge ${className}">${statusText.toUpperCase()}</span>`;
+        }
+
+
+        // --- NAVIGATION FUNCTIONS ---
+
+        function showManagedData() {
+            searchPolicySection.style.display = 'none';
+            managedDataSection.style.display = 'flex';
+            renderManagedData(); 
+        }
+
+        function showSearchPolicy() {
+            managedDataSection.style.display = 'none';
+            searchPolicySection.style.display = 'flex';
+        }
+
+        function renderManagedData() {
+            managedDataBody.innerHTML = '';
+            managedDataList.forEach(data => {
+                const row = managedDataBody.insertRow();
+                row.insertCell().textContent = data.spaj;
+                row.insertCell().textContent = data.nasabah;
+                row.insertCell().textContent = data.grace;
+                row.insertCell().innerHTML = getStatusBadge(data.status); // Menggunakan badge
+                row.insertCell().textContent = data.bas;
+                row.insertCell().textContent = data.end_date;
+                
+                const actionCell = row.insertCell();
+                actionCell.innerHTML = `
+                    <button class="managed-action-btn" onclick="openManagedDataActionModal('${data.spaj}', '${data.nasabah}')">Aksi</button>
+                `;
+            });
+        }
+        
+        // --- MODAL DATA KELOLAAN FUNCTIONS ---
+
+        function openManagedDataActionModal(spaj, nasabah) {
+            currentManagedDataSPAJ = spaj;
+            document.getElementById('managedModalSpaj').textContent = spaj;
+            document.getElementById('managedModalNasabah').textContent = nasabah;
+            activityFormWrapper.style.display = 'none'; 
+            managedDataActionModal.style.display = 'block';
+        }
+
+        function handleManagedDataAction(actionType) {
+            if (actionType === 'InputActivity') {
+                activityFormWrapper.style.display = 'block';
+            } else if (actionType === 'Detail') {
+                alert(`Menampilkan Detail data kelolaan untuk SPAJ: ${currentManagedDataSPAJ}\n(Logika Detail penuh akan diimplementasikan di sini).`);
+                managedDataActionModal.style.display = 'none';
+            }
+        }
+        
+        // Handle Submit Form Aktivitas
+        activityForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const activityType = document.getElementById('activityType').value;
+            const activityNotes = document.getElementById('activityNotes').value;
+            
+            alert(`Aktivitas Baru untuk SPAJ ${currentManagedDataSPAJ} berhasil dicatat!\nJenis: ${activityType}\nCatatan: ${activityNotes}`);
+            
+            managedDataActionModal.style.display = 'none';
+            activityForm.reset();
+        });
+
+
+        // --- RIWAYAT DAN PENCARIAN FUNCTIONS ---
+
+        function renderHistoryTables(polis, historyData) {
+            claimHistoryBody.innerHTML = '';
+            serviceHistoryBody.innerHTML = '';
+            complaintHistoryBody.innerHTML = '';
+            historyWrappers.forEach(wrapper => wrapper.style.display = 'none');
+            
+            const renderTable = (data, bodyElement, detailField) => {
+                if (data.length > 0) {
+                    data.forEach(item => {
+                        const row = bodyElement.insertRow();
+                        row.insertCell().textContent = polis; 
+                        
+                        let statusContent = '';
+                        if (detailField === 'complaint') {
+                            statusContent = item.detail; 
+                        } else {
+                            statusContent = getStatusBadge(item.status); // Menggunakan badge
+                        }
+                        
+                        row.insertCell().innerHTML = statusContent;
+                        row.insertCell().textContent = item.date;
+                        row.insertCell().textContent = item.user;
+                    });
+                    bodyElement.closest('.table-wrapper').style.display = 'block';
+                }
+            };
+
+            renderTable(historyData.claim, claimHistoryBody, 'claim');
+            renderTable(historyData.service, serviceHistoryBody, 'service');
+            renderTable(historyData.complaint, complaintHistoryBody, 'complaint');
+        }
+
+        searchForm.addEventListener('submit', function(event) {
+            event.preventDefault(); 
+            const input = document.getElementById('searchInput').value.toUpperCase().trim();
+            resultsBody.innerHTML = '';
+            mainResultWrapper.style.display = 'none';
+            message.textContent = '';
+            
+            let channel = '';
+            if (input.includes('AJK')) { channel = 'AJK'; } else if (input.includes('IBR')) { channel = 'IBR'; } 
+            else if (input.includes('EB')) { channel = 'EB'; } else if (input.includes('TEL')) { channel = 'TEL'; } 
+            else {
+                message.textContent = 'Data tidak ditemukan.';
+                renderHistoryTables('', { claim: [], service: [], complaint: [] });
+                return;
+            }
+            
+            currentChannelKey = channel;
+            const data = simulatedData[channel];
+
+            currentPolis = data.polis;
+            currentNasabah = data.nama;
+
+            // Masukkan data ke Tabel Utama
+            const newRow = resultsBody.insertRow();
+            newRow.insertCell().textContent = data.polis;
+            newRow.insertCell().textContent = data.nama;
+            newRow.insertCell().innerHTML = getStatusBadge(data.status_polis);
+            newRow.insertCell().innerHTML = getStatusBadge(data.claim);
+            newRow.insertCell().innerHTML = getStatusBadge(data.service);
+            newRow.insertCell().innerHTML = getStatusBadge(data.payment);
+            newRow.insertCell().textContent = data.channel;
+            const actionCell = newRow.insertCell();
+            actionCell.innerHTML = `<button class="action-btn" onclick="openActionSelectModal('${data.polis}', '${data.nama}')">Aksi</button>`;
+
+            mainResultWrapper.style.display = 'block';
+            message.textContent = `Menampilkan hasil untuk No. Polis ${data.polis} (Channel: ${channel})`;
+            renderHistoryTables(data.polis, data.history);
+        });
+
+        // --- MODAL KHUSUS POLIS & CLAIM SUBMIT FUNCTIONS ---
+
+        function openActionSelectModal(polis, nasabah) {
+            currentPolis = polis;
+            currentNasabah = nasabah;
+            document.getElementById('actionModalPolis').textContent = polis;
+            actionSelectModal.style.display = 'block';
+        }
+
+        function openSpecificModal(actionType) {
+            actionSelectModal.style.display = 'none';
+            if (actionType === 'Claim') {
+                modalPolis.value = currentPolis;
+                modalNasabah.value = currentNasabah;
+                claimModal.style.display = 'block';
+            } else {
+                alert(`Aksi: ${actionType} untuk No. Polis ${currentPolis} sedang diajukan.`);
+            }
+        }
+        
+        claimForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const polis = modalPolis.value;
+            const jenisKlaim = document.getElementById('jenisKlaim').value;
+            
+            const newData = { status: 'Diajukan', date: new Date().toISOString().slice(0, 10), user: 'AdminSistem' };
+            
+            if (simulatedData[currentChannelKey]) {
+                simulatedData[currentChannelKey].history.claim.unshift(newData); 
+            }
+            renderHistoryTables(polis, simulatedData[currentChannelKey].history);
+            alert(`✅ Pengajuan Klaim "${jenisKlaim}" untuk Polis ${polis} Berhasil Diterima dan Ditambahkan ke Riwayat!`);
+            claimModal.style.display = 'none';
+            claimForm.reset();
+        });
+
+        // --- Penutupan Modal Global ---
+        document.querySelectorAll('.close-btn').forEach(btn => {
+            btn.onclick = function() {
+                actionSelectModal.style.display = 'none';
+                claimModal.style.display = 'none';
+                managedDataActionModal.style.display = 'none';
+                activityForm.reset();
+            }
+        });
+        
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+                activityForm.reset();
+            }
+        }
+    </script>
+</body>
+</html>
