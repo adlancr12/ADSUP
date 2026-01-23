@@ -33,36 +33,72 @@
 
         .container { max-width: 1200px; margin: auto; }
 
-        /* Header & Search */
+        /* Header */
         .header {
             display: flex;
             justify-content: space-between;
-            align-items: flex-end;
-            margin-bottom: 32px;
-            gap: 20px;
+            align-items: flex-start;
+            margin-bottom: 24px;
         }
 
         .welcome-text h1 { font-size: 28px; font-weight: 700; color: var(--text-dark); }
         .welcome-text p { color: var(--secondary); font-size: 14px; }
 
-        .search-wrapper { position: relative; }
-        .search-wrapper i {
+        /* Multi-Field Search Area */
+        .search-container {
+            background: var(--card);
+            padding: 20px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            margin-bottom: 32px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .search-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .search-group label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--secondary);
+            text-transform: uppercase;
+            padding-left: 4px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper i {
             position: absolute;
-            left: 16px;
+            left: 14px;
             top: 50%;
             transform: translateY(-50%);
             color: var(--secondary);
+            font-size: 14px;
         }
-        .search-wrapper input {
-            padding: 12px 16px 12px 48px;
-            width: 320px;
-            border-radius: 12px;
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 10px 12px 10px 40px;
+            border-radius: 10px;
             border: 1px solid var(--border);
             outline: none;
+            font-family: inherit;
+            font-size: 13px;
             transition: 0.3s;
-            background: var(--card);
         }
-        .search-wrapper input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); }
+
+        .input-wrapper input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        }
 
         /* Summary Stats Grid */
         .stats-grid {
@@ -101,7 +137,7 @@
         .stat-info span { font-size: 13px; color: var(--secondary); font-weight: 500; }
         .stat-info h2 { font-size: 24px; font-weight: 700; }
 
-        /* Main Section */
+        /* Sections */
         .section-card {
             background: var(--card);
             border-radius: 16px;
@@ -154,13 +190,13 @@
 
         @keyframes slideIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Table Styling */
+        /* Table */
         table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 16px; background: #f8fafc; font-size: 12px; text-transform: uppercase; color: var(--secondary); font-weight: 600; letter-spacing: 0.05em; }
+        th { text-align: left; padding: 16px; background: #f8fafc; font-size: 12px; text-transform: uppercase; color: var(--secondary); font-weight: 600; }
         td { padding: 16px; border-bottom: 1px solid var(--border); font-size: 14px; }
-        tr:hover td { background-color: #fcfcfc; }
+        
+        .cc-font { font-family: 'Courier New', monospace; font-weight: 600; }
 
-        /* Badges */
         .badge {
             padding: 4px 10px;
             border-radius: 6px;
@@ -175,8 +211,8 @@
         .badge-info { background: #dbeafe; color: #1e40af; }
 
         @media (max-width: 768px) {
-            .header { flex-direction: column; align-items: flex-start; }
-            .search-wrapper input { width: 100%; }
+            .header { flex-direction: column; }
+            .search-container { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -189,9 +225,36 @@
             <p>13 Januari 2026</p>
             <h1>Portal Inquiry Polis</h1>
         </div>
-        <div class="search-wrapper">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" id="globalSearch" placeholder="Cari No. Polis..." onkeyup="searchAllTables()">
+    </div>
+
+    <div class="search-container">
+        <div class="search-group">
+            <label>Nama Nasabah</label>
+            <div class="input-wrapper">
+                <i class="fa-solid fa-user"></i>
+                <input type="text" id="searchNama" placeholder="Cari Nama..." onkeyup="multiFilter()">
+            </div>
+        </div>
+        <div class="search-group">
+            <label>No. Polis</label>
+            <div class="input-wrapper">
+                <i class="fa-solid fa-file-invoice"></i>
+                <input type="text" id="searchPolis" placeholder="Cari No. Polis..." onkeyup="multiFilter()">
+            </div>
+        </div>
+        <div class="search-group">
+            <label>DOB (Tgl Lahir)</label>
+            <div class="input-wrapper">
+                <i class="fa-solid fa-calendar"></i>
+                <input type="text" id="searchDOB" placeholder="DD-MM-YYYY" onkeyup="multiFilter()">
+            </div>
+        </div>
+        <div class="search-group">
+            <label>No. Kartu Kredit</label>
+            <div class="input-wrapper">
+                <i class="fa-solid fa-credit-card"></i>
+                <input type="text" id="searchCC" placeholder="Jika Polis Tele " onkeyup="multiFilter()">
+            </div>
         </div>
     </div>
 
@@ -217,30 +280,39 @@
     <div class="section-card">
         <div class="card-title"><i class="fa-solid fa-database" style="color: var(--primary);"></i> Ringkasan Data Polis</div>
         <div style="overflow-x: auto;">
-            <table>
+            <table id="mainTable">
                 <thead>
                     <tr>
                         <th>No</th>
                         <th>No Polis</th>
-                        <th>Nama Produk</th>
-                        <th>Status Polis</th>
-                        <th>Tanggal Issued</th>
+                        <th>Nama Nasabah</th>
+                        <th>DOB</th>
+                        <th>No. Kartu Kredit</th>
+                        <th>Produk</th>
+                        <th>Premi</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
-                <tbody id="polisTable">
+                <tbody>
                     <tr>
                         <td>1</td>
-                        <td><strong>POLIS1</strong></td>
-                        <td>HYNP - Health Plan</td>
-                        <td><span class="badge badge-success"><i class="fa-solid fa-check"></i> Aktif</span></td>
-                        <td>15-Jan-26</td>
+                        <td><strong>POLIS123</strong></td>
+                        <td>BUDI SANTOSO</td>
+                        <td>12-05-1985</td>
+                        <td class="cc-font">4512-XXXX-1234</td>
+                        <td>Health Plan</td>
+                        <td>100.000</td>
+                        <td><span class="badge badge-success">Aktif</span></td>
                     </tr>
                     <tr>
                         <td>2</td>
                         <td><strong>POLIS-AJK1</strong></td>
-                        <td>AJK - Life Insurance</td>
-                        <td><span class="badge badge-success"><i class="fa-solid fa-check"></i> Aktif</span></td>
-                        <td>15-Jan-26</td>
+                        <td>SITI AMINAH</td>
+                        <td>20-11-1990</td>
+                        <td class="cc-font">5211-XXXX-5678</td>
+                        <td>Life Protection</td>
+                         <td>100.000</td>
+                        <td><span class="badge badge-success">Aktif</span></td>
                     </tr>
                 </tbody>
             </table>
@@ -261,8 +333,13 @@
                 <thead>
                     <tr>
                         <th>No</th>
-                        <th>No Polis</th>
+                        <th>No Register</th>
+                        <th>No Polis / Nama</th>
+                        <th>Tipe Klaim</th>
                         <th>Jenis Klaim</th>
+                        <th>Tipe Nasabah</th>
+                        <th>Nama Produk</th>
+                        <th>Tanggal Pengajuan</th>
                         <th>Status</th>
                         <th>Last Update</th>
                     </tr>
@@ -270,8 +347,13 @@
                 <tbody>
                     <tr>
                         <td>1</td>
-                        <td><strong>POLIS1</strong></td>
+                          <td>123</td>
+                        <td><strong>POLIS123</strong><br><small>BUDI SANTOSO</small></td>
+                        <td>kesehatan</td>
                         <td>Rawat Inap</td>
+                         <td>Vip</td>
+                         <td>Healty Ges</td>
+                          <td>10-Jan-26</td>
                         <td><span class="badge badge-warning">On Progress</span></td>
                         <td>10-Jan-26</td>
                     </tr>
@@ -284,8 +366,10 @@
                 <thead>
                     <tr>
                         <th>No</th>
-                        <th>No Polis</th>
-                        <th>Tipe Perubahan</th>
+                        <th>No Polis / Nama</th>
+                        <th>Nama Produk</th>
+                        <th>Jenis pengajuan</th>
+                        <th>Tanggal pengajuan</th>
                         <th>Status</th>
                         <th>Last Update</th>
                     </tr>
@@ -293,8 +377,10 @@
                 <tbody>
                     <tr>
                         <td>1</td>
-                        <td><strong>POLIS1</strong></td>
+                        <td><strong>POLIS123</strong><br><small>BUDI SANTOSO</small></td>
+                        <td>Healty Gess</td>
                         <td>Ubah Ahli Waris</td>
+                        <td>11-Jan-26</td>
                         <td><span class="badge badge-info">Admin Review</span></td>
                         <td>11-Jan-26</td>
                     </tr>
@@ -307,18 +393,22 @@
                 <thead>
                     <tr>
                         <th>No</th>
-                        <th>No Polis</th>
+                        <th>No Polis / Nama</th>
+                        <th>NIK</th>
                         <th>Subjek</th>
-                        <th>Prioritas</th>
+                        <th>tanggal Pengajuan</th>
+                        <th>Status</th>
                         <th>Last Update</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
                         <td>1</td>
-                        <td><strong>POLIS1</strong></td>
-                        <td>Keterlambatan Polis Fisik</td>
-                        <td><span class="badge badge-warning" style="background:#fee2e2; color:#b91c1c;">High Priority</span></td>
+                        <td><strong>POLIS123</strong><br><small>BUDI SANTOSO</small></td>
+                        <td>????</td>
+                        <td>Polis Fisik Belum Sampai</td>
+                        <td>12-Jan-26</td>
+                        <td><span class="badge badge-warning" style="background:#fee2e2; color:#b91c1c;">Pending</span></td>
                         <td>12-Jan-26</td>
                     </tr>
                 </tbody>
@@ -337,18 +427,34 @@
         e.currentTarget.classList.add('active');
     }
 
-    // Live Search Logic for all tables
-    function searchAllTables() {
-        let filter = document.getElementById('globalSearch').value.toUpperCase();
-        let tables = document.querySelectorAll('table');
-        
+    // Multi-Field Search Logic
+    function multiFilter() {
+        // Ambil value dari 4 field
+        const fNama = document.getElementById('searchNama').value.toUpperCase();
+        const fPolis = document.getElementById('searchPolis').value.toUpperCase();
+        const fDOB = document.getElementById('searchDOB').value.toUpperCase();
+        const fCC = document.getElementById('searchCC').value.toUpperCase();
+
+        // Target semua tabel yang ada di halaman
+        const tables = document.querySelectorAll('table');
+
         tables.forEach(table => {
-            let tr = table.getElementsByTagName('tr');
+            const tr = table.getElementsByTagName('tr');
+            
             for (let i = 1; i < tr.length; i++) {
-                let td = tr[i].getElementsByTagName('td')[1]; // Column Index for No Polis
-                if (td) {
-                    let text = td.textContent || td.innerText;
-                    tr[i].style.display = text.toUpperCase().indexOf(filter) > -1 ? "" : "none";
+                const rowText = tr[i].textContent || tr[i].innerText;
+                const upperText = rowText.toUpperCase();
+
+                // Logic AND: Baris harus mengandung semua kata kunci yang diisi
+                const matchNama = upperText.indexOf(fNama) > -1;
+                const matchPolis = upperText.indexOf(fPolis) > -1;
+                const matchDOB = upperText.indexOf(fDOB) > -1;
+                const matchCC = upperText.indexOf(fCC) > -1;
+
+                if (matchNama && matchPolis && matchDOB && matchCC) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
                 }
             }
         });
